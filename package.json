@@ -1,0 +1,6 @@
+{
+  "name": "node-red-codeengine",
+  "version": "1.0.0",
+  "description": "Node-RED integration layer running on IBM Code Engine",
+  "private": true
+}
