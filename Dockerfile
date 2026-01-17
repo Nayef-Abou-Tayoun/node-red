@@ -8,18 +8,18 @@ RUN npm install \
     node-red-node-ui-table \
     ibm-cos-sdk
 
-# Create data dirs
-RUN mkdir -p /data/images \
- && chown -R node-red:node-red /data
+# Create Node-RED data folders
+RUN mkdir -p /data/images
 
-# COPY bootstrap.sh FROM REPO → INTO IMAGE
-COPY bootstrap.sh /data/bootstrap.sh
+# Copy bootstrap script to a STANDARD binary path
+COPY bootstrap.sh /usr/local/bin/bootstrap.sh
 
-# Verify at build time (CRITICAL)
-RUN ls -la /data && chmod +x /data/bootstrap.sh
+# Make sure it exists and is executable (hard fail if missing)
+RUN ls -la /usr/local/bin \
+ && chmod +x /usr/local/bin/bootstrap.sh
 
 USER node-red
 
 EXPOSE 1880
 
-ENTRYPOINT ["/bin/sh", "/data/bootstrap.sh"]
+ENTRYPOINT ["/bin/sh", "/usr/local/bin/bootstrap.sh"]
