@@ -1,25 +1,23 @@
 FROM nodered/node-red:3.1.10
 
+# Switch to root to install packages & set permissions
 USER root
 
-# Install required packages
+# Install additional Node-RED nodes + COS SDK
 RUN npm install \
     node-red-dashboard \
     node-red-node-ui-table \
     ibm-cos-sdk
 
-# Create Node-RED data folders
-RUN mkdir -p /data/images
-
-# Copy bootstrap script to a STANDARD binary path
+# Copy bootstrap script and make it executable
 COPY bootstrap.sh /usr/local/bin/bootstrap.sh
+RUN chmod +x /usr/local/bin/bootstrap.sh
 
-# Make sure it exists and is executable (hard fail if missing)
-RUN ls -la /usr/local/bin \
- && chmod +x /usr/local/bin/bootstrap.sh
-
+# Switch back to non-root user (important)
 USER node-red
 
+# Expose Node-RED port
 EXPOSE 1880
 
-ENTRYPOINT ["/bin/sh", "/usr/local/bin/bootstrap.sh"]
+# Run bootstrap first, then Node-RED
+ENTRYPOINT ["/usr/local/bin/bootstrap.sh"]
