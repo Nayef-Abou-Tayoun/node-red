@@ -2,9 +2,12 @@
 set -e
 
 echo "🚀 Bootstrapping Node-RED on Code Engine..."
+echo "📂 Ensuring folders exist"
 
-# Ensure image folder exists
 mkdir -p /data/images
+
+echo "📂 /data contents before bootstrap:"
+ls -la /data
 
 # Load flows.json from COS (if configured)
 if [ -n "$COS_ENDPOINT" ] && [ -n "$COS_BUCKET" ] && [ -n "$COS_FLOWS_OBJECT" ]; then
@@ -14,31 +17,36 @@ if [ -n "$COS_ENDPOINT" ] && [ -n "$COS_BUCKET" ] && [ -n "$COS_FLOWS_OBJECT" ];
 const COS = require("ibm-cos-sdk");
 const fs = require("fs");
 
-const cos = new COS.S3({
-  endpoint: process.env.COS_ENDPOINT,
-  accessKeyId: process.env.COS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.COS_SECRET_ACCESS_KEY,
-  signatureVersion: "v4"
-});
+(async () => {
+  try {
+    const cos = new COS.S3({
+      endpoint: process.env.COS_ENDPOINT,
+      accessKeyId: process.env.COS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.COS_SECRET_ACCESS_KEY,
+      signatureVersion: "v4"
+    });
 
-const params = {
-  Bucket: process.env.COS_BUCKET,
-  Key: process.env.COS_FLOWS_OBJECT
-};
+    const params = {
+      Bucket: process.env.COS_BUCKET,
+      Key: process.env.COS_FLOWS_OBJECT
+    };
 
-cos.getObject(params).promise()
-  .then(data => {
-    fs.writeFileSync("/data/flows.json", data.Body);
+    const data = await cos.getObject(params).promise();
+    fs.writeFileSync("/data/flows.json", data.Body.toString("utf-8"));
+
     console.log("✅ flows.json loaded from COS");
-  })
-  .catch(err => {
+  } catch (err) {
     console.error("❌ Failed to load flows.json", err);
     process.exit(1);
-  });
+  }
+})();
 EOF
 else
   echo "⚠️ COS env vars not set — starting without flows.json"
 fi
+
+echo "📂 /data contents after bootstrap:"
+ls -la /data
 
 echo "▶️ Starting Node-RED"
 exec npm start -- --userDir /data
