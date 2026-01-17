@@ -1,23 +1,26 @@
 FROM nodered/node-red:3.1.10
 
-# Switch to root to install packages & set permissions
+# Switch to root for installs and filesystem prep
 USER root
 
-# Install additional Node-RED nodes + COS SDK
+# Install extra Node-RED nodes + COS SDK
 RUN npm install \
     node-red-dashboard \
     node-red-node-ui-table \
     ibm-cos-sdk
 
-# Copy bootstrap script and make it executable
-COPY bootstrap.sh /usr/local/bin/bootstrap.sh
-RUN chmod +x /usr/local/bin/bootstrap.sh
+# Prepare Node-RED writable directories
+RUN mkdir -p /data/images \
+ && chown -R node-red:node-red /data
 
-# Switch back to non-root user (important)
+# Copy bootstrap script into writable path
+COPY bootstrap.sh /data/bootstrap.sh
+RUN chmod +x /data/bootstrap.sh
+
+# Switch back to non-root user
 USER node-red
 
-# Expose Node-RED port
 EXPOSE 1880
 
-# Run bootstrap first, then Node-RED
-ENTRYPOINT ["/usr/local/bin/bootstrap.sh"]
+# Bootstrap loads flows.json, then starts Node-RED
+ENTRYPOINT ["/data/bootstrap.sh"]
