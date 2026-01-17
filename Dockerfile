@@ -1,11 +1,17 @@
 FROM nodered/node-red:3.1.10
 
-# Install additional Node-RED nodes
+# Install additional Node-RED nodes + COS SDK
 RUN npm install \
     node-red-dashboard \
-    node-red-node-ui-table
+    node-red-node-ui-table \
+    ibm-cos-sdk
 
-# Node-RED default user directory is /data
-# Flows, credentials, and settings will be loaded from the mounted volume
+# Copy bootstrap script (loads flows from COS)
+COPY bootstrap.sh /usr/local/bin/bootstrap.sh
+RUN chmod +x /usr/local/bin/bootstrap.sh
 
+# Node-RED default port
 EXPOSE 1880
+
+# Run bootstrap first, then start Node-RED
+ENTRYPOINT ["/usr/local/bin/bootstrap.sh"]
