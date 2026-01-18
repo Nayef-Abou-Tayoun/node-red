@@ -55,5 +55,10 @@ fi
 echo "📂 /data contents after bootstrap:"
 ls -la /data
 
-echo "▶️ Starting Node-RED"
-exec npm start -- --userDir /data
+echo "▶️ Starting Node-RED with custom settings"
+exec npm start -- \
+  --userDir /data \
+  --settings /data/settings.js
+
+
+
