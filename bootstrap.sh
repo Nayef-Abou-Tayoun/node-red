@@ -2,6 +2,13 @@
 set -e
 
 echo "🚀 Bootstrapping Node-RED on Code Engine..."
+
+# 🔥 FORCE RESET Node-RED STATE ON EVERY START
+echo "🧹 Clearing existing Node-RED flows"
+rm -f /data/flows.json
+rm -f /data/flows_cred.json
+
+
 echo "📂 Ensuring folders exist"
 
 mkdir -p /data/images
