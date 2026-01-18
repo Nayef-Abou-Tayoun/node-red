@@ -7,15 +7,15 @@ async function main() {
     process.exit(1);
   }
 
-const cos = new COS.S3({
-  endpoint: "https://s3.us-south.cloud-object-storage.appdomain.cloud",
-  accessKeyId: "aaba9617589c4b8f965d554a2cd66347",
-  secretAccessKey: "572616223d2f533dad15ad6ab033ddce6d0e3424a39cb981",
-  signatureVersion: 'v4'
-});
+  const cos = new COS.S3({
+    endpoint: process.env.COS_ENDPOINT,
+    accessKeyId: process.env.COS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.COS_SECRET_ACCESS_KEY,
+    signatureVersion: "v4"
+  });
 
   const data = await cos.getObject({
-    Bucket: "node-red-flows",
+    Bucket: process.env.COS_BUCKET,
     Key: key
   }).promise();
 
