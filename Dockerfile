@@ -20,6 +20,6 @@ RUN chmod +x /usr/local/bin/bootstrap.sh \
 
 USER node-red
 
-EXPOSE 1880
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/bootstrap.sh"]
