@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+export PORT=${PORT:-8080}
+
 echo "🚀 Bootstrapping Node-RED on Code Engine..."
 
 # 🔥 FORCE RESET Node-RED STATE ON EVERY START
@@ -8,9 +10,7 @@ echo "🧹 Clearing existing Node-RED flows"
 rm -f /data/flows.json
 rm -f /data/flows_cred.json
 
-
 echo "📂 Ensuring folders exist"
-
 mkdir -p /data/images
 
 echo "📂 /data contents before bootstrap:"
@@ -55,10 +55,7 @@ fi
 echo "📂 /data contents after bootstrap:"
 ls -la /data
 
-echo "▶️ Starting Node-RED with custom settings"
+echo "▶️ Starting Node-RED with custom settings on port $PORT"
 exec npm start -- \
   --userDir /data \
   --settings /data/settings.js
-
-
-
